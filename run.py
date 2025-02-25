@@ -1,6 +1,9 @@
 import datetime
 import gspread
 from google.oauth2.service_account import Credentials
+import os
+import json
+import base64
 from hangman_words import *
 from hangman_art import *
 from hangman_extras import *
@@ -19,14 +22,32 @@ SCOPE = [
     "https://www.googleapis.com/auth/drive"
 ]
 
-CREDS = Credentials.from_service_account_file('creds.json')
+# Fetch the creds from the environment variable 'CREDS'
+creds_b64 = os.getenv("CREDS")  # Retrieve the Base64-encoded credentials
+
+if creds_b64:
+    # Decode the credentials from Base64
+    creds_json = base64.b64decode(creds_b64).decode("utf-8")
+    
+    # Load the credentials from the JSON string
+    creds_dict = json.loads(creds_json)
+    
+    # Use the credentials to authenticate
+    CREDS = Credentials.from_service_account_info(creds_dict)
+else:
+    raise FileNotFoundError("CREDS environment variable not found!")
+
+# Apply the credentials to create a scoped client
 SCOPED_CREDS = CREDS.with_scopes(SCOPE)
 GSPREAD_CLIENT = gspread.authorize(SCOPED_CREDS)
+
+# Open the Google Sheet
 SHEET = GSPREAD_CLIENT.open('hangman_leaderboard')
 
+# Get the leaderboard data
 leaderboard = SHEET.worksheet("leaderboard")
-
 data = leaderboard.get_all_values()
+
 
 # CONSTS
 CORRECT_GUESSED = 25
