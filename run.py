@@ -265,7 +265,7 @@ if __name__ == '__main__':
 
     # Allows the user to input their own name and city to play the game
     while True:
-        player_name = input(f"\n{Fore.CYAN}NAME:\n>>> ").strip().upper()
+        player_name = "User"
         if len(player_name) == 0:
             print(f"{Fore.RED}This is not a valid name!")
             continue
